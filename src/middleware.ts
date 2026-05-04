@@ -14,6 +14,13 @@ export async function middleware(req: NextRequest) {
     if (pathname.startsWith("/api")) {
         return NextResponse.next();
     }
+    const segmentsEarly = pathname.split("/").filter(Boolean);
+    if (segmentsEarly.length >= 2 && isLocale(segmentsEarly[0]!) && segmentsEarly[1] === "admin") {
+        const tail = segmentsEarly.slice(2);
+        const url = req.nextUrl.clone();
+        url.pathname = tail.length ? `/admin/${tail.join("/")}` : "/admin";
+        return NextResponse.redirect(url);
+    }
     if (pathname.startsWith("/admin")) {
         const secret = process.env.ADMIN_JWT_SECRET;
         if (pathname.startsWith("/admin/login")) {
