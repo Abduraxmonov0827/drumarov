@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+}
+
+model Department {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  shortDescription String
+  description      String
+  icon             String   @default("Building2")
+  sortOrder        Int      @default(0)
+  services         Service[]
+  doctors          Doctor[]
+  appointments     Appointment[]
+}
+
+model Service {
+  id             String      @id @default(cuid())
+  name           String
+  slug           String      @unique
+  description    String
+  sortOrder      Int         @default(0)
+  departmentId   String?
+  department     Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+}
+
+model Doctor {
+  id              String      @id @default(cuid())
+  name            String
+  slug            String      @unique
+  specialty       String
+  bio             String
+  bioDetailed     String
+  imageUrl        String?
+  email           String?
+  phone           String?
+  experienceYears Int?
+  treatmentAreas  String
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  sortOrder       Int         @default(0)
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String
+  content     String
+  imageUrl    String?
+  status      String    @default("DRAFT")
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Appointment {
+  id             String     @id @default(cuid())
+  name           String
+  email          String
+  phone          String
+  departmentId   String
+  department     Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  preferredDate  String
+  preferredTime  String
+  message        String?
+  status         String     @default("NEW")
+  createdAt      DateTime   @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+}
