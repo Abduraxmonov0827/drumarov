@@ -14,11 +14,7 @@ export async function DoctorForm({ doctor }: { doctor?: DoctorRow | null }) {
       ? doctor.imageUrl
       : "";
   return (
-    <form
-      action={saveDoctor}
-      encType="multipart/form-data"
-      className="mx-auto max-w-2xl space-y-4"
-    >
+    <form action={saveDoctor} className="mx-auto max-w-2xl space-y-4">
       {doctor ? <input type="hidden" name="id" value={doctor.id} /> : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
@@ -89,8 +85,7 @@ export async function DoctorForm({ doctor }: { doctor?: DoctorRow | null }) {
         <div className="sm:col-span-2 space-y-2 rounded-lg border border-slate-200 bg-slate-50/80 p-4">
           <label className="text-sm font-medium text-slate-700">Rasm</label>
           <p className="text-xs text-slate-500">
-            Kompyuterdan yuklang (JPEG, PNG, WebP, maks. 5 MB) yoki tashqi
-            havola qoldiring.
+            Hozircha faqat tashqi rasm havolasi (URL) qo‘llab-quvvatlanadi.
           </p>
           {doctor?.imageUrl ? (
             <div className="relative h-28 w-full max-w-[11rem] overflow-hidden rounded-lg border border-slate-200 shadow-sm">
@@ -104,12 +99,6 @@ export async function DoctorForm({ doctor }: { doctor?: DoctorRow | null }) {
               />
             </div>
           ) : null}
-          <input
-            name="imageFile"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="block w-full max-w-md text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95"
-          />
           <div>
             <label className="text-sm font-medium text-slate-700">
               Tashqi rasm havolasi (ixtiyoriy)
