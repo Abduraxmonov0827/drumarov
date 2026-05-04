@@ -4,10 +4,18 @@ import { prisma } from "@/lib/prisma";
 import { isLocalUploadPath, removeLocalUploadFile, saveUploadedImage } from "@/lib/save-uploaded-image";
 import { slugify } from "@/lib/slug";
 import { getAdminSession } from "@/lib/session";
+import { locales } from "@/lib/i18n";
 async function requireAdmin() {
     const s = await getAdminSession();
     if (!s)
         throw new Error("Ruxsat yo‘q");
+}
+function revalidateLocalized(path: string) {
+    const normalized = path.startsWith("/") ? path : `/${path}`;
+    revalidatePath(normalized);
+    for (const locale of locales) {
+        revalidatePath(normalized === "/" ? `/${locale}` : `/${locale}${normalized}`);
+    }
 }
 async function resolveImageField(formData: FormData, options: {
     fileField: string;
@@ -73,15 +81,19 @@ export async function saveDoctor(formData: FormData) {
     else {
         await prisma.doctor.create({ data });
     }
-    revalidatePath("/shifokorlar");
+    revalidateLocalized("/shifokorlar");
+    revalidateLocalized("/");
     revalidatePath("/admin/doctors");
 }
 export async function deleteDoctor(id: string) {
     await requireAdmin();
-    const prev = await prisma.doctor.findUnique({ where: { id }, select: { imageUrl: true } });
+    const prev = await prisma.doctor.findUnique({ where: { id }, select: { imageUrl: true, slug: true } });
     await removeLocalUploadFile(prev?.imageUrl);
     await prisma.doctor.delete({ where: { id } });
-    revalidatePath("/shifokorlar");
+    revalidateLocalized("/shifokorlar");
+    revalidateLocalized("/");
+    if (prev?.slug)
+        revalidateLocalized(`/shifokorlar/${prev.slug}`);
     revalidatePath("/admin/doctors");
 }
 export async function saveService(formData: FormData) {
@@ -104,13 +116,15 @@ export async function saveService(formData: FormData) {
     else {
         await prisma.service.create({ data });
     }
-    revalidatePath("/xizmatlar");
+    revalidateLocalized("/xizmatlar");
+    revalidateLocalized("/");
     revalidatePath("/admin/services");
 }
 export async function deleteService(id: string) {
     await requireAdmin();
     await prisma.service.delete({ where: { id } });
-    revalidatePath("/xizmatlar");
+    revalidateLocalized("/xizmatlar");
+    revalidateLocalized("/");
     revalidatePath("/admin/services");
 }
 export async function saveDepartment(formData: FormData) {
@@ -134,13 +148,15 @@ export async function saveDepartment(formData: FormData) {
     else {
         await prisma.department.create({ data });
     }
-    revalidatePath("/bolimlar");
+    revalidateLocalized("/bolimlar");
+    revalidateLocalized("/");
     revalidatePath("/admin/departments");
 }
 export async function deleteDepartment(id: string) {
     await requireAdmin();
     await prisma.department.delete({ where: { id } });
-    revalidatePath("/bolimlar");
+    revalidateLocalized("/bolimlar");
+    revalidateLocalized("/");
     revalidatePath("/admin/departments");
 }
 export async function saveBlogPost(formData: FormData) {
@@ -179,7 +195,7 @@ export async function saveBlogPost(formData: FormData) {
     else {
         await prisma.blogPost.create({ data });
     }
-    revalidatePath("/blog");
+    revalidateLocalized("/blog");
     revalidatePath("/admin/blog");
 }
 export async function deleteBlogPost(id: string) {
@@ -187,7 +203,7 @@ export async function deleteBlogPost(id: string) {
     const prev = await prisma.blogPost.findUnique({ where: { id }, select: { imageUrl: true } });
     await removeLocalUploadFile(prev?.imageUrl);
     await prisma.blogPost.delete({ where: { id } });
-    revalidatePath("/blog");
+    revalidateLocalized("/blog");
     revalidatePath("/admin/blog");
 }
 export async function updateAppointmentStatus(id: string, status: string) {
