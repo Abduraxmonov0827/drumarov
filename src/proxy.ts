@@ -2,11 +2,14 @@ import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { defaultLocale, isLocale } from "@/lib/i18n";
+
 const COOKIE = "clinic_admin";
+
 function looksLikePublicAsset(pathname: string) {
     return /\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|json|woff2?|webmanifest)$/i.test(pathname);
 }
-export async function middleware(req: NextRequest) {
+
+export async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
     if (pathname.startsWith("/_next") || pathname === "/favicon.ico" || looksLikePublicAsset(pathname)) {
         return NextResponse.next();
@@ -56,6 +59,7 @@ export async function middleware(req: NextRequest) {
     url.pathname = `/${defaultLocale}${pathname}`;
     return NextResponse.redirect(url);
 }
+
 export const config = {
     matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

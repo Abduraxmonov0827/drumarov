@@ -4,6 +4,11 @@ const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
     throw new Error("DATABASE_URL o‘rnatilmagan.");
 }
+if (!/^postgres(ql)?:\/\//i.test(databaseUrl)) {
+    throw new Error(
+        "DATABASE_URL PostgreSQL bo‘lishi kerak (postgresql://…). `.env` da file:./… (SQLite) qolib ketgan bo‘lsa, Neon string bilan almashtiring.",
+    );
+}
 const adapter = new PrismaPg({ connectionString: databaseUrl });
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
