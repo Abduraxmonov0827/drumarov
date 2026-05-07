@@ -14,7 +14,13 @@ export default async function PublicLayout({ children, params, }: Readonly<{
     return (<>
       <AosInitLoader />
       <SiteHeader locale={locale as Locale} dictionary={dictionary}/>
-      <div className="flex-1">{children}</div>
+      <div className="relative flex-1 overflow-hidden">
+        <div className="blueprint-grid pointer-events-none absolute inset-0 -z-10" />
+        <div className="noise-overlay pointer-events-none absolute inset-0 -z-10" />
+        <div className="hero-glow pointer-events-none absolute -left-24 top-0 -z-10 h-[30rem] w-[30rem] rounded-full" />
+        <div className="hero-glow-secondary pointer-events-none absolute right-0 top-[24rem] -z-10 h-[28rem] w-[28rem] rounded-full" />
+        {children}
+      </div>
       <SiteFooter locale={locale as Locale} dictionary={dictionary}/>
     </>);
 }
